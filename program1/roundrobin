@@ -1,0 +1,106 @@
+#include <stdio.h>
+
+struct Process {
+    int pid;
+    int bt;
+    int rt;
+    int wt;
+    int tat;
+};
+
+
+void roundRobin(struct Process p[], int n, int tq, float *avg_wt, float *avg_tat) {
+    int time = 0, remain = n, i;
+    float total_wt = 0, total_tat = 0;
+
+
+    for(i = 0; i < n; i++) {
+        p[i].rt = p[i].bt;
+    }
+
+    for(i = 0; remain != 0; ) {
+        if(p[i].rt > 0 && p[i].rt <= tq) {
+            time += p[i].rt;
+            p[i].rt = 0;
+            remain--;
+
+            p[i].tat = time;
+            p[i].wt = p[i].tat - p[i].bt;
+        }
+        else if(p[i].rt > 0) {
+            p[i].rt -= tq;
+            time += tq;
+        }
+
+        if(i == n - 1)
+            i = 0;
+        else
+            i++;
+    }
+
+
+    printf("\nTime Quantum = %d \n", tq);
+    printf("PID\tBT\tWT\tTAT\n");
+
+    for(i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\n",
+        p[i].pid, p[i].bt, p[i].wt, p[i].tat);
+
+        total_wt += p[i].wt;
+        total_tat += p[i].tat;
+    }
+
+    *avg_wt = total_wt / n;
+    *avg_tat = total_tat / n;
+
+    printf("Average WT = %.2f\n", *avg_wt);
+    printf("Average TAT = %.2f\n", *avg_tat);
+}
+
+int main() {
+    int n, i, q1, q2;
+    struct Process p[10], copy[10];
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+        printf("Enter Burst Time for P%d: ", i+1);
+        scanf("%d", &p[i].bt);
+        p[i].pid = i + 1;
+    }
+
+    printf("\nEnter first Time Quantum: ");
+    scanf("%d", &q1);
+
+    printf("Enter second Time Quantum: ");
+    scanf("%d", &q2);
+
+    for(i = 0; i < n; i++) {
+        copy[i] = p[i];
+    }
+
+    float avg_wt1, avg_tat1, avg_wt2, avg_tat2;
+
+
+    roundRobin(p, n, q1, &avg_wt1, &avg_tat1);
+
+
+    for(i = 0; i < n; i++) {
+        p[i] = copy[i];
+    }
+
+    roundRobin(p, n, q2, &avg_wt2, &avg_tat2);
+
+
+    printf("\nOptimal Quantum \n");
+
+    if(avg_wt1 < avg_wt2)
+        printf("Quantum %d is OPTIMAL (Lower Average Waiting Time)\n", q1);
+    else if(avg_wt2 < avg_wt1)
+        printf("Quantum %d is OPTIMAL (Lower Average Waiting Time)\n", q2);
+    else
+        printf("Both Quantum %d and %d are equally optimal\n", q1, q2);
+
+    return 0;
+}
