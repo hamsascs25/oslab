@@ -1,0 +1,131 @@
+#include <stdio.h>
+
+struct Process {
+    int pid, bt, pri, ct, tat, wt, rt;
+};
+
+
+void nonPreemptivePriority() {
+    int n, i, j;
+    struct Process p[10], temp;
+
+    printf("\nEnter number of processes: ");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+        printf("\nProcess %d\n", i+1);
+        printf("Burst Time: ");
+        scanf("%d", &p[i].bt);
+        printf("Priority: ");
+        scanf("%d", &p[i].pri);
+        p[i].pid = i + 1;
+    }
+
+
+    for(i = 0; i < n-1; i++) {
+        for(j = i+1; j < n; j++) {
+            if(p[i].pri > p[j].pri) {
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+            }
+        }
+    }
+
+
+    p[0].ct = p[0].bt;
+    for(i = 1; i < n; i++)
+        p[i].ct = p[i-1].ct + p[i].bt;
+
+    for(i = 0; i < n; i++) {
+        p[i].tat = p[i].ct;
+        p[i].wt = p[i].tat - p[i].bt;
+    }
+
+    printf("\nPID\tBT\tPRI\tCT\tTAT\tWT\n");
+    for(i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+        p[i].pid, p[i].bt, p[i].pri,
+        p[i].ct, p[i].tat, p[i].wt);
+    }
+}
+
+
+
+void preemptivePriority() {
+    int n, i, time = 0, completed = 0, minPri, index;
+    struct Process p[10];
+
+    printf("\nEnter number of processes: ");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+        printf("\nProcess %d\n", i+1);
+        printf("Burst Time: ");
+        scanf("%d", &p[i].bt);
+        printf("Priority: ");
+        scanf("%d", &p[i].pri);
+
+        p[i].rt = p[i].bt;
+        p[i].pid = i + 1;
+    }
+
+    while(completed != n) {
+        minPri = 9999;
+        index = -1;
+
+
+        for(i = 0; i < n; i++) {
+            if(p[i].rt > 0 && p[i].pri < minPri) {
+                minPri = p[i].pri;
+                index = i;
+            }
+        }
+
+        if(index != -1) {
+            p[index].rt--;
+            time++;
+
+            if(p[index].rt == 0) {
+                completed++;
+                p[index].ct = time;
+                p[index].tat = p[index].ct;
+                p[index].wt = p[index].tat - p[index].bt;
+            }
+        }
+    }
+
+    printf("\nPID\tBT\tPRI\tCT\tTAT\tWT\n");
+    for(i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+        p[i].pid, p[i].bt, p[i].pri,
+        p[i].ct, p[i].tat, p[i].wt);
+    }
+}
+
+
+
+int main() {
+    int choice;
+
+    printf("\nCPU Scheduling Menu\n");
+    printf("1. Non-Preemptive Priority\n");
+    printf("2. Preemptive Priority\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+
+    switch(choice) {
+        case 1:
+            nonPreemptivePriority();
+            break;
+
+        case 2:
+            preemptivePriority();
+            break;
+
+        default:
+            printf("Invalid Choice!\n");
+    }
+
+    return 0;
+}
