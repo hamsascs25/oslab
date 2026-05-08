@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    int n, i;
+    float C[10], T[10], D[10];
+    float utilization = 0, bound;
+    float completion = 0;
+
+    printf("Enter number of tasks: ");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+        printf("\nTask %d\n", i + 1);
+
+        printf("Enter execution time: ");
+        scanf("%f", &C[i]);
+
+        printf("Enter period: ");
+        scanf("%f", &T[i]);
+
+        printf("Enter deadline: ");
+        scanf("%f", &D[i]);
+
+        utilization += (C[i] / T[i]);
+    }
+
+    bound = n * (pow(2, 1.0/n) - 1);
+
+    printf("\nTotal Utilization = %.2f", utilization);
+    printf("\nRM Bound = %.2f\n", bound);
+
+    if(utilization <= bound)
+        printf("\nUtilization Test PASSED\n");
+    else
+        printf("\nUtilization Test FAILED\n");
+
+
+    printf("\nDeadline Analysis:\n");
+
+    for(i = 0; i < n; i++) {
+        completion += C[i]; 
+
+        printf("\nTask %d", i + 1);
+        printf("\nCompletion Time = %.2f", completion);
+        printf("\nDeadline = %.2f", D[i]);
+
+        if(completion <= D[i])
+            printf("\nDeadline Met\n");
+        else
+            printf("\nDeadline Missed\n");
+    }
+
+    return 0;
+}
