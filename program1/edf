@@ -1,0 +1,112 @@
+#include <stdio.h>
+
+int main() {
+
+    int C1, T1, D1;
+    int C2, T2, D2;
+
+    int time = 0;
+    int remP2;
+
+
+    printf("Enter P1 Execution Time: ");
+    scanf("%d", &C1);
+
+    printf("Enter P1 Period: ");
+    scanf("%d", &T1);
+
+    printf("Enter P1 Deadline: ");
+    scanf("%d", &D1);
+
+    printf("\nEnter P2 Execution Time: ");
+    scanf("%d", &C2);
+
+    printf("Enter P2 Period: ");
+    scanf("%d", &T2);
+
+    printf("Enter P2 Deadline: ");
+    scanf("%d", &D2);
+
+    printf("\n--- EDF Scheduling ---\n");
+
+
+    printf("\nTime 0:");
+    printf("\nP1 Deadline = %d", D1);
+    printf("\nP2 Deadline = %d", D2);
+
+
+    if(D1 < D2) {
+
+        printf("\nP1 runs first");
+
+        time += C1;
+
+        printf("\nP1 completes at %d\n", time);
+
+ 
+        remP2 = C2;
+
+        int run = T1 - time;
+
+        if(run > remP2)
+            run = remP2;
+
+        remP2 -= run;
+        time += run;
+
+        printf("P2 executes till %d\n", time);
+
+     
+        if(remP2 > 0) {
+
+            int newDeadlineP1 = time + D1;
+
+            printf("\nNew P1 arrives");
+            printf("\nNew P1 Deadline = %d", newDeadlineP1);
+            printf("\nRemaining P2 Deadline = %d\n", D2);
+
+           
+            if(D2 < newDeadlineP1) {
+
+                printf("P2 continues (earlier deadline)\n");
+
+                time += remP2;
+
+                printf("P2 completes at %d\n", time);
+
+          
+                time += C1;
+
+                printf("P1 second instance completes at %d\n", time);
+
+            } else {
+
+                printf("P1 preempts P2\n");
+
+           
+                time += C1;
+
+                printf("P1 second instance completes at %d\n", time);
+
+            
+                time += remP2;
+
+                printf("P2 completes at %d\n", time);
+            }
+        }
+    }
+    else {
+
+        printf("\nP2 runs first");
+
+        time += C2;
+
+        printf("\nP2 completes at %d", time);
+
+        time += C1;
+
+        printf("\nP1 completes at %d", time);
+    }
+
+    return 0;
+}
